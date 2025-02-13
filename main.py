@@ -1,24 +1,8 @@
 import requests
-from bs4 import BeautifulSoup
 import sqlite3
+from bs4 import BeautifulSoup
 import time
-
-
-# function, that creates the database
-def create_database():
-    conn = sqlite3.connect('news.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS news (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            date TEXT NOT NULL,
-            link TEXT NOT NULL UNIQUE
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
+from database import connection, create_database
 
 # news download function
 def fetch_news():
@@ -36,10 +20,9 @@ def fetch_news():
         news_list.append((title, date, full_link))
     return news_list
 
-
 # function, that adds news to the database
 def add_news_to_db(news_list):
-    conn = sqlite3.connect('news.db')
+    conn = connection()
     cursor = conn.cursor()
 
     for title, date, link in news_list:
@@ -54,7 +37,6 @@ def add_news_to_db(news_list):
     conn.commit()
     conn.close()
 
-
 # main function serve process
 def main():
     create_database()
@@ -64,7 +46,6 @@ def main():
         add_news_to_db(news_list)
         print(f"Added {len(news_list)} new entries.")
         time.sleep(3600)
-
 
 if __name__ == "__main__":
     main()
